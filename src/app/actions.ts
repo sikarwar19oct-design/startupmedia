@@ -1,7 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { sql } from "@vercel/postgres";
+import { createClient } from "@supabase/supabase-js";
+
+// Supabase Configuration
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || "";
+const supabase = (supabaseUrl && supabaseServiceKey) ? createClient(supabaseUrl, supabaseServiceKey) : null;
 
 export async function saveArticle(formData: FormData) {
   try {
@@ -39,7 +44,7 @@ export async function saveArticle(formData: FormData) {
         fs.writeFileSync(filepath, buffer);
         imageUrl = `/uploads/${filename}`;
       } catch (e) {
-        console.warn("Image upload failed (likely production read-only filesystem), falling back to placeholder.");
+        console.warn("Image upload failed, falling back to placeholder.");
         imageUrl = "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80";
       }
     } else {
@@ -53,41 +58,24 @@ export async function saveArticle(formData: FormData) {
       title,
       excerpt: excerpt || "",
       content: content || "",
-      readTime: "5 min",
+      read_time: "5 min",
       date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
       trending: false,
       author
     };
 
-    // Database Logic: Use Postgres if URL is present (Vercel Production)
-    if (process.env.POSTGRES_URL) {
-      await sql`
-        INSERT INTO articles (slug, title, image, category, excerpt, content, read_time, date, trending, author)
-        VALUES (
-          ${newArticle.slug}, 
-          ${newArticle.title}, 
-          ${newArticle.image}, 
-          ${newArticle.category}, 
-          ${newArticle.excerpt}, 
-          ${newArticle.content}, 
-          ${newArticle.readTime}, 
-          ${newArticle.date}, 
-          ${newArticle.trending}, 
-          ${newArticle.author}
-        )
-        ON CONFLICT (slug) DO UPDATE SET
-          title = EXCLUDED.title,
-          image = EXCLUDED.image,
-          category = EXCLUDED.category,
-          excerpt = EXCLUDED.excerpt,
-          content = EXCLUDED.content,
-          read_time = EXCLUDED.read_time,
-          date = EXCLUDED.date,
-          trending = EXCLUDED.trending,
-          author = EXCLUDED.author
-      `;
+    // Database Logic: Use Supabase if configured
+    if (supabase) {
+      const { error } = await supabase
+        .from('articles')
+        .upsert(newArticle, { onConflict: 'slug' });
+        
+      if (error) {
+          console.error("Supabase Save Error:", error.message);
+          return { success: false, error: "Database error" };
+      }
     } else {
-      // Local Logic: Use articles.json if no database is connected
+      // Local Logic: Fallback to JSON if no database
       const fs = require("fs");
       const path = require("path");
       const dbPath = path.join(process.cwd(), "src/data/articles.json");
@@ -98,15 +86,13 @@ export async function saveArticle(formData: FormData) {
           const fileData = fs.readFileSync(dbPath, "utf8");
           articles = JSON.parse(fileData);
         }
-      } catch (error) {
-        console.error("Local JSON read failed", error);
-      }
+      } catch (e) {}
       
       const existingIndex = articles.findIndex((a: any) => a.slug === slug);
       if (existingIndex > -1) {
-        articles[existingIndex] = newArticle;
+        articles[existingIndex] = { ...newArticle, readTime: "5 min" };
       } else {
-        articles.unshift(newArticle);
+        articles.unshift({ ...newArticle, readTime: "5 min" });
       }
       
       fs.writeFileSync(dbPath, JSON.stringify(articles, null, 2));

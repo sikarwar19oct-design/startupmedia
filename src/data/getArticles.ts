@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { sql } from '@vercel/postgres';
+import { createClient } from '@supabase/supabase-js';
 
 export interface Article {
   slug: string;
@@ -15,50 +15,54 @@ export interface Article {
   author?: string;
 }
 
+// Supabase Configuration
+const supabaseUrl = process.env.SUPABASE_URL || "";
+const supabaseKey = process.env.SUPABASE_ANON_KEY || "";
+const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
+
 /**
- * Fetches all articles from either Postgres (Production) or local JSON (Development).
+ * Fetches all articles from either Supabase (Production) or local JSON (Development).
  */
 export async function getArticles(): Promise<Article[]> {
-  // Check if we have a Database connected (Vercel automatic env var)
-  if (process.env.POSTGRES_URL) {
+  if (supabase) {
     try {
-      // First, ensure table exists (simple one-time check)
-      await sql`
-        CREATE TABLE IF NOT EXISTS articles (
-          slug TEXT PRIMARY KEY,
-          title TEXT,
-          image TEXT,
-          category TEXT,
-          excerpt TEXT,
-          content TEXT,
-          read_time TEXT,
-          date TEXT,
-          trending BOOLEAN,
-          author TEXT
-        )
-      `;
+      const { data, error } = await supabase
+        .from('articles')
+        .select('*')
+        .order('date', { ascending: false });
 
-      const { rows } = await sql`SELECT * FROM articles ORDER BY date DESC`;
+      if (!error && data) {
+        // Map database columns to Article interface
+        const dbArticles: Article[] = data.map(row => ({
+          slug: row.slug,
+          title: row.title,
+          image: row.image,
+          category: row.category,
+          excerpt: row.excerpt,
+          content: row.content,
+          readTime: row.read_time || "5 min",
+          date: row.date,
+          trending: row.trending,
+          author: row.author
+        }));
+
+        // Combine with local articles (as fallback)
+        const jsonArticles = getLocalArticles();
+        const merged = [...dbArticles];
+        
+        // Add JSON articles that don't exist in DB yet
+        jsonArticles.forEach(la => {
+          if (!merged.some(ma => ma.slug === la.slug)) {
+            merged.push(la);
+          }
+        });
+        
+        return merged;
+      }
       
-      // Map SQL rows back to our Article camelCase interface
-      const dbArticles: Article[] = rows.map(row => ({
-        slug: row.slug,
-        title: row.title,
-        image: row.image,
-        category: row.category,
-        excerpt: row.excerpt,
-        content: row.content,
-        readTime: row.read_time,
-        date: row.date,
-        trending: row.trending,
-        author: row.author
-      }));
-
-      // Combined with local articles for fallback/seed
-      const jsonArticles = getLocalArticles();
-      return [...dbArticles, ...jsonArticles.filter(la => !dbArticles.some(da => da.slug === la.slug))];
+      if (error) console.warn("Supabase Fetch Error:", error.message);
     } catch (error) {
-      console.error("Database connection failed, falling back to JSON:", error);
+      console.error("Supabase connection failed, falling back to JSON:", error);
     }
   }
 
