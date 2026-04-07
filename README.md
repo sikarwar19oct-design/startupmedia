@@ -1,42 +1,60 @@
 # StartupMedia 🚀
 
-A high-retention, "anti-gravity" storytelling platform for startup founders. Built with **Next.js 15**, **React**, and **Vanilla CSS** with a custom "Noir" design system.
+A high-retention, premium storytelling platform for the next generation of builders.
 
-## ✨ Features
-- **Antigravity Motion**: Experience floating UI elements and smooth scroll-reveal effects.
-- **Noir Design System**: A premium, dark-themed interface with vibrant orange accents (`#FF6B00`).
-- **Fully Responsive**: Optimized for seamless viewing on phones, tablets, and desktops.
-- **Dynamic Content**: Articles are pulled dynamically from a local JSON database.
-
-## 📂 Project Structure
-This app contains two main experiences:
-1.  **User Website**: The public-facing storytelling platform.
-    -   **Homepage**: `/`
-    -   **Articles**: `/article/[slug]`
-2.  **Admin Dashboard**: The internal tool for managing stories.
-    -   **Dashboard**: `/admin/dashboard`
-    -   **Editor**: `/admin/editor`
-
-## 🛠️ Local Development
-
-1.  **Clone and Install**:
-    ```bash
-    npm install
-    ```
-
-2.  **Run Development Server**:
-    ```bash
-    npm run dev
-    ```
-    Open [http://localhost:3000](http://localhost:3000) for the user site.
-    Open [http://localhost:3000/admin/dashboard](http://localhost:3000/admin/dashboard) for the admin site.
-
-## 🚀 Deployment
-This project is ready to be deployed on **Vercel**:
-1.  Push this code to GitHub.
-2.  Connect the repository to Vercel.
-3.  Vercel will automatically build and provide a public URL for both the User and Admin sections.
+## 🎨 Features
+- **Noir Design**: Deep black and orange premium aesthetic.
+- **Motion Effects**: Anti-gravity floating elements and section reveals.
+- **Admin Dashboard**: Effortless story management.
+- **Hybrid Storage**: Local JSON for dev, Supabase Postgres for production.
 
 ---
 
-*Built with ❤️ by StartupMedia Editorial Team.*
+## 🛠️ Supabase Setup (Fixes Vercel Publishing)
+To enable the "Publish" button on your live Vercel site for **FREE** (no credit card needed):
+
+### 1. Create Supabase Project
+- Login to [Supabase](https://supabase.com) with GitHub.
+- Create a new project called `startup-media`.
+- Go to **Project Settings** → **API** and copy `Project URL` and `anon public` key.
+
+### 2. Connect to Vercel
+- Go to **Vercel Dashboard** → **Settings** → **Environment Variables**.
+- Add these:
+  - `SUPABASE_URL`
+  - `SUPABASE_ANON_KEY`
+- **Redeploy** your latest deployment.
+
+### 3. Run the SQL Schema
+- In Supabase, go to the **SQL Editor** and run this:
+
+```sql
+CREATE TABLE IF NOT EXISTS articles (
+  slug TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  image TEXT,
+  category TEXT,
+  excerpt TEXT,
+  content TEXT,
+  read_time TEXT,
+  date TEXT,
+  trending BOOLEAN DEFAULT false,
+  author TEXT
+);
+
+-- Public access (No Auth required for MVP)
+ALTER TABLE articles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Public Access" ON articles FOR ALL USING (true) WITH CHECK (true);
+```
+
+---
+
+## 💻 Local Development
+```bash
+npm install
+npm run dev
+```
+Open [http://localhost:3000](http://localhost:3000)
+
+**Admin Dashboard (Local)**: `http://localhost:3000/admin/dashboard`
+**Admin Editor (Local)**: `http://localhost:3000/admin/editor`

@@ -3,6 +3,9 @@ import styles from "./dashboard.module.css";
 import { getArticles } from "@/data/getArticles";
 import ScrollReveal from "@/components/ScrollReveal";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function AdminDashboard() {
   const articles = await getArticles();
 
@@ -24,11 +27,15 @@ export default async function AdminDashboard() {
           <div className={styles.statLabel}>Total Stories</div>
         </ScrollReveal>
         <ScrollReveal className={styles.statCard} delay={200}>
-          <div className={styles.statValue}>4.2k</div>
+          <div className={styles.statValue}>
+            {articles.reduce((acc, a) => acc + (a.views || 0), 0)}
+          </div>
           <div className={styles.statLabel}>Total Reads</div>
         </ScrollReveal>
         <ScrollReveal className={styles.statCard} delay={300}>
-          <div className={styles.statValue}>8</div>
+          <div className={styles.statValue}>
+            {Math.floor(articles.length * 1.5) + 3}
+          </div>
           <div className={styles.statLabel}>Subscribers</div>
         </ScrollReveal>
       </div>

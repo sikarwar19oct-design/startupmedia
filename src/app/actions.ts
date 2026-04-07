@@ -108,3 +108,27 @@ export async function saveArticle(formData: FormData) {
     return { success: false, error: "Internal Server Error" };
   }
 }
+
+export async function incrementView(slug: string) {
+  try {
+    if (supabase) {
+      // Use RPC if we have it, or just a simple update
+      // Supabase supports column increments via SQL but not directly in SDK 
+      // without fetch. The most reliable way for now is a simple upsert/update
+      const { data, error } = await supabase
+        .from('articles')
+        .select('views')
+        .eq('slug', slug)
+        .single();
+        
+      if (!error && data) {
+        await supabase
+          .from('articles')
+          .update({ views: (data.views || 0) + 1 })
+          .eq('slug', slug);
+      }
+    }
+  } catch (err) {
+    console.error("View tracking failed:", err);
+  }
+}

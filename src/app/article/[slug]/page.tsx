@@ -12,6 +12,12 @@ export default async function ArticlePage({
 }) {
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
+  
+  // Track view (Non-blocking)
+  if (article) {
+    const { incrementView } = require("@/app/actions");
+    incrementView(slug).catch(console.error);
+  }
 
   if (!article) {
     notFound();

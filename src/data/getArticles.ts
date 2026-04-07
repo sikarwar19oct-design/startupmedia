@@ -13,6 +13,7 @@ export interface Article {
   date: string;
   trending?: boolean;
   author?: string;
+  views?: number;
 }
 
 // Supabase Configuration

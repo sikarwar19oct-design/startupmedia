@@ -4,6 +4,9 @@ import { getArticles } from "@/data/getArticles";
 import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function HomePage({
   searchParams,
 }: {
