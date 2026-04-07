@@ -20,7 +20,6 @@ export default function Footer() {
             <Link href="/">Home</Link>
             <Link href="/#stories">Stories</Link>
             <Link href="/#categories">Categories</Link>
-            <Link href="/admin/dashboard" style={{ marginTop: '0.8rem', opacity: 0.6, fontSize: '0.85rem', display: 'block' }}>Admin Dashboard</Link>
           </div>
           <div className={styles.col}>
             <h4>Company</h4>

@@ -27,7 +27,6 @@ export default function NavBar() {
           <Link href="/#categories" onClick={() => setMenuOpen(false)}>Categories</Link>
           <Link href="/about" onClick={() => setMenuOpen(false)}>About</Link>
           <Link href="/contact" onClick={() => setMenuOpen(false)}>Contact</Link>
-          <Link href="/admin/dashboard" className={styles.adminLink} onClick={() => setMenuOpen(false)}>Admin</Link>
         </nav>
 
         <button
