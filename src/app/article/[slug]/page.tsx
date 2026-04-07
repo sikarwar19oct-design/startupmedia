@@ -11,14 +11,14 @@ export default async function ArticlePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = getArticleBySlug(slug);
+  const article = await getArticleBySlug(slug);
 
   if (!article) {
     notFound();
   }
 
   // Related stories - get a few other articles
-  const allArticles = getArticles();
+  const allArticles = await getArticles();
   const relatedStories = allArticles
     .filter((a) => a.slug !== slug)
     .slice(0, 3);
@@ -66,7 +66,7 @@ export default async function ArticlePage({
           <span className="category-pill">{article.category}</span>
           <h1 className={styles.heroTitle}>{article.title}</h1>
           <div className={styles.heroMeta}>
-            <span>StartupMedia Editorial</span>
+            <span>{article.author || "monarchraushan"}</span>
             <span className={styles.dot}>·</span>
             <span>{article.date}</span>
             <span className={styles.dot}>·</span>

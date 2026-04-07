@@ -9,17 +9,18 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@vercel/postgres": "^0.10.0",
+    "lucide-react": "^0.475.0",
     "next": "latest",
     "react": "latest",
-    "react-dom": "latest",
-    "lucide-react": "^0.475.0"
+    "react-dom": "latest"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "typescript": "^5",
     "eslint": "^9",
-    "eslint-config-next": "latest"
+    "eslint-config-next": "latest",
+    "typescript": "^5"
   }
 }

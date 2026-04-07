@@ -13,7 +13,7 @@ export default async function HomePage({
   const currentPage = parseInt(page || "1", 10);
   const itemsPerPage = 6;
 
-  const allArticles = getArticles();
+  const allArticles = await getArticles();
   
   // Trending can be based on a flag or just the first 3
   const trendingStories = allArticles.filter(a => a.trending).slice(0, 3);

@@ -4,7 +4,7 @@ import { getArticles } from "@/data/getArticles";
 import ScrollReveal from "@/components/ScrollReveal";
 
 export default async function AdminDashboard() {
-  const articles = getArticles();
+  const articles = await getArticles();
 
   return (
     <div className={`container ${styles.dashboard}`}>
