@@ -57,18 +57,8 @@ export async function getArticles(): Promise<Article[]> {
           author: row.author
         }));
 
-        // Combine with local articles (as fallback)
-        const jsonArticles = getLocalArticles();
-        const merged = [...dbArticles];
-        
-        // Add JSON articles that don't exist in DB yet
-        jsonArticles.forEach(la => {
-          if (!merged.some(ma => ma.slug === la.slug)) {
-            merged.push(la);
-          }
-        });
-        
-        return merged;
+        // Return pure database articles without merging local JSON cache
+        return dbArticles;
       }
       
       if (error) console.warn("Supabase Fetch Error:", error.message);
