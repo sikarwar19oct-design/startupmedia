@@ -33,7 +33,7 @@ export async function getArticles(): Promise<Article[]> {
         .order('date', { ascending: false });
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Supabase request timed out")), 3000)
+        setTimeout(() => reject(new Error("Supabase request timed out")), 15000)
       );
 
       // @ts-ignore - Supabase returns a PostgrestBuilder which is Thenable
