@@ -28,12 +28,17 @@ export async function saveArticle(formData: FormData) {
     writeToLog("--- START saveArticle ---");
     
     // 0. Environment check
-    if (!supabaseUrl || !supabaseServiceKey || supabaseServiceKey === "YOUR_SUPABASE_ANON_KEY") {
+    const url = process.env.SUPABASE_URL || supabaseUrl;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || supabaseServiceKey;
+
+    if (!url || !key || key === "YOUR_SUPABASE_ANON_KEY") {
       writeToLog("MISSING SUPABASE CONFIG");
-      return { success: false, error: "Supabase not configured. Restart server after .env.local update." };
+      return { success: false, error: `Supabase not configured. URL exists: ${!!url}, Key exists: ${!!key}` };
     }
     
-    if (!supabase) {
+    const liveSupabase = createClient(url, key);
+
+    if (!liveSupabase) {
       writeToLog("FAILED CLIENT INITIALIZATION");
       return { success: false, error: "Failed to initialize Supabase client." };
     }
@@ -92,9 +97,9 @@ export async function saveArticle(formData: FormData) {
     };
 
     // 4. Save to DB
-    if (supabase) {
+    if (liveSupabase) {
       writeToLog("DB ATTEMPT: Upserting...");
-      const { error } = await supabase
+      const { error } = await liveSupabase
         .from('articles')
         .upsert(newArticle, { onConflict: 'slug' });
         
@@ -140,15 +145,16 @@ export async function incrementView(slug: string) {
 
 export async function deleteArticle(slug: string) {
   try {
-    if (!supabaseUrl || !supabaseServiceKey || supabaseServiceKey === "YOUR_SUPABASE_ANON_KEY") {
-      return { success: false, error: "Supabase not configured." };
+    const url = process.env.SUPABASE_URL || supabaseUrl;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || supabaseServiceKey;
+    
+    if (!url || !key || key === "YOUR_SUPABASE_ANON_KEY") {
+      return { success: false, error: `Supabase not configured. URL exists: ${!!url}, Key exists: ${!!key}` };
     }
 
-    if (!supabase) {
-      return { success: false, error: "Failed to initialize Supabase client." };
-    }
+    const liveSupabase = createClient(url, key);
 
-    const { error } = await supabase
+    const { error } = await liveSupabase
       .from('articles')
       .delete()
       .eq('slug', slug);
