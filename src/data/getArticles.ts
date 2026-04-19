@@ -17,14 +17,17 @@ export interface Article {
 }
 
 // Supabase Configuration
-const supabaseUrl = process.env.SUPABASE_URL || "";
-const supabaseKey = process.env.SUPABASE_ANON_KEY || "";
-const supabase = (supabaseUrl && supabaseKey) ? createClient(supabaseUrl, supabaseKey) : null;
+function getSupabaseClient() {
+  const url = process.env.SUPABASE_URL || "";
+  const key = process.env.SUPABASE_ANON_KEY || "";
+  return (url && key && key !== "YOUR_SUPABASE_ANON_KEY") ? createClient(url, key) : null;
+}
 
 /**
  * Fetches all articles from either Supabase (Production) or local JSON (Development).
  */
 export async function getArticles(): Promise<Article[]> {
+  const supabase = getSupabaseClient();
   if (supabase) {
     try {
       const fetchPromise = supabase
