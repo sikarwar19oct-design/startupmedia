@@ -65,6 +65,7 @@ export async function saveArticle(formData: FormData) {
 
     // 2. Image Upload — saves to public/uploads/ (local/self-hosted)
     // File extends Blob, so instanceof Blob covers both File and Blob types
+    writeToLog(`IMAGE_FILE: type=${typeof imageFile}, constructor=${imageFile?.constructor?.name}, isBlob=${imageFile instanceof Blob}, size=${(imageFile as any)?.size}`);
     const isValidFile = imageFile instanceof Blob && imageFile.size > 0;
     if (isValidFile) {
       try {

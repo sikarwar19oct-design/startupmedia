@@ -50,12 +50,12 @@ export default function AdminEditor() {
       cleanFormData.append("excerpt", excerpt);
       cleanFormData.append("content", content);
       
-      const fileInput = (e.currentTarget as HTMLFormElement).elements.namedItem("coverImage") as HTMLInputElement;
+      const fileInput = fileInputRef.current;
       if (fileInput?.files?.[0]) {
-        console.log("Adding file to form data:", fileInput.files[0].name);
+        console.log("Adding file to form data:", fileInput.files[0].name, fileInput.files[0].size);
         cleanFormData.append("coverImage", fileInput.files[0]);
       } else {
-        console.log("No file to add.");
+        console.log("No file selected — using placeholder image.");
       }
 
       const res = await saveArticle(cleanFormData);
@@ -105,19 +105,14 @@ export default function AdminEditor() {
           required
         />
 
-        <div
-          className={styles.imageUploadContainer}
-          onClick={() => fileInputRef.current?.click()}
-          style={{ cursor: 'pointer' }}
-        >
+        <div className={styles.imageUploadContainer}>
           <input 
             ref={fileInputRef}
             type="file" 
             name="coverImage"
             accept="image/*" 
-            className={styles.hiddenFileInput} 
+            className={styles.hiddenFileInput}
             onChange={handleImageUpload}
-            style={{ display: 'none' }}
           />
           {coverImage ? (
             <>
