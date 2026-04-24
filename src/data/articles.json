@@ -1,17 +1,5 @@
 [
   {
-    "slug": "21-year-old-built-1m-app",
-    "image": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80",
-    "category": "Tech",
-    "title": "How a 21-Year-Old Built a $1M ARR App with Zero Funding",
-    "excerpt": "A masterlcass in constraint-driven growth. No VC, no office, just raw obsession.",
-    "content": "The story begins in a dorm room, as all great startup myths do. But for Leo, there was no 'Aha!' moment. There was only a frustratingly slow internet connection and a burning desire to fix it.\n\nLeo didn't have access to Silicon Valley capital. He didn't have a network of mentors. He had a 2017 MacBook Air and a subscription to a $10/month server.\n\n## The Problem-First Mindset\n\nMost founders start with a solution looking for a problem. Leo started with a pain point so acute he couldn't ignore it: cross-border data synchronization for remote developers. He spent the first three months just talking to people on Discord. Not selling, just listening.\n\nQUOTE: I didn't want to build a unicorn. I wanted to build a tool that didn't suck.\n\n## The MVP Trap\n\nLeo's first version was ugly. It was essentially a command-line interface with a barely-functional web dashboard. But it solved the core problem 10x better than the enterprise competitors. He launched on Product Hunt with zero expectations.\n\n* He focused on a single feature: Atomic sync.\n* He ignored marketing until he had 100 paying customers.\n* He personally onboarded every single user via Zoom.\n\n## The Scaling Phase\n\nBy month six, the app was doing $8,000 in monthly recurring revenue (MRR). This is where most founders would go for a Seed round. Leo chose the anti-gravity path: zero funding. He reinvested every dollar back into better infrastructure. \n\nToday, the app processes $1M in annual revenue with a team of exactly three people. \n\n## Key Takeaways for Founders\n\n1. Constraints are a competitive advantage. Because Leo couldn't spend his way out of problems, he had to out-think them.\n2. Do things that don't scale. Those early Zoom calls built a community of superfans who became his marketing team.\n3. Retention is the only metric that matters. Leo's churn rate is less than 1% because the tool became indispensable.",
-    "readTime": "12 min",
-    "date": "Oct 24, 2023",
-    "trending": true,
-    "author": "monarchraushan"
-  },
-  {
     "slug": "fired-then-funded",
     "image": "https://images.unsplash.com/photo-1553877522-43269d4ea984?w=800&q=80",
     "category": "Startup",
