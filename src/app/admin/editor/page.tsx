@@ -15,13 +15,25 @@ export default function AdminEditor() {
   const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [coverImageName, setCoverImageName] = useState<string | null>(null);
+  const [imageError, setImageError] = useState<string | null>(null);
   const [isPublishing, setIsPublishing] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const MAX_FILE_SIZE = 40 * 1024 * 1024; // 40 MB
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setImageError(null);
     if (file) {
+      if (file.size > MAX_FILE_SIZE) {
+        setImageError(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max allowed: 40 MB.`);
+        e.target.value = "";
+        return;
+      }
       const imageUrl = URL.createObjectURL(file);
       setCoverImage(imageUrl);
+      setCoverImageName(`${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)`);
     }
   };
   
@@ -93,24 +105,37 @@ export default function AdminEditor() {
           required
         />
 
-        <div className={styles.imageUploadContainer}>
+        <div
+          className={styles.imageUploadContainer}
+          onClick={() => fileInputRef.current?.click()}
+          style={{ cursor: 'pointer' }}
+        >
           <input 
+            ref={fileInputRef}
             type="file" 
             name="coverImage"
             accept="image/*" 
             className={styles.hiddenFileInput} 
             onChange={handleImageUpload}
+            style={{ display: 'none' }}
           />
           {coverImage ? (
             <>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={coverImage} alt="Cover Preview" className={styles.imagePreview} />
-              <div className={styles.changeImageBtn}>Change Cover Image</div>
+              <div className={styles.changeImageBtn}>
+                🔄 Change Image{coverImageName ? ` — ${coverImageName}` : ""}
+              </div>
             </>
           ) : (
             <div className={styles.uploadPlaceholder}>
               <span className={styles.uploadIcon}>📸</span>
-              <span>Click or drag to upload a high-res cover image</span>
+              <span>Click to upload a cover image (max 40 MB)</span>
+            </div>
+          )}
+          {imageError && (
+            <div style={{ color: '#ff4d4f', fontSize: '0.85rem', marginTop: '0.5rem', padding: '0.5rem', background: 'rgba(255,77,79,0.1)', borderRadius: '6px' }}>
+              ⚠️ {imageError}
             </div>
           )}
         </div>

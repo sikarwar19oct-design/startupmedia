@@ -45,7 +45,12 @@ export async function saveArticle(formData: FormData) {
 
     // 1. Get Fields
     const title = formData.get("title") as string;
-    const slug = formData.get("slug") as string;
+    let slug = formData.get("slug") as string;
+    
+    if (slug) {
+      slug = slug.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    }
+
     const category = formData.get("category") as string;
     const excerpt = formData.get("excerpt") as string;
     const content = formData.get("content") as string;
@@ -58,28 +63,33 @@ export async function saveArticle(formData: FormData) {
 
     let imageUrl = "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80";
 
-    // 2. Image Upload (Isolated try-catch)
-    if (imageFile instanceof Blob && imageFile.size > 0 && typeof (imageFile as any).arrayBuffer === 'function') {
+    // 2. Image Upload — saves to public/uploads/ (local/self-hosted)
+    const isValidFile = imageFile && (imageFile instanceof Blob || imageFile instanceof File) && (imageFile as Blob).size > 0;
+    if (isValidFile) {
       try {
-        writeToLog(`IMAGE ATTEMPT: size=${imageFile.size}`);
-        const bytes = await imageFile.arrayBuffer();
+        const blob = imageFile as Blob;
+        writeToLog(`IMAGE ATTEMPT: size=${blob.size}, type=${blob.type}`);
+        const bytes = await blob.arrayBuffer();
         const buffer = Buffer.from(bytes);
-        
-        const uploadDir = path.join(process.cwd(), "public", "uploads");
-        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-        const filename = `${Date.now()}-${(imageFile as any).name?.replaceAll(" ", "_") || 'upload'}`;
+        const uploadDir = path.join(process.cwd(), "public", "uploads");
+        fs.mkdirSync(uploadDir, { recursive: true });
+
+        // Sanitize original filename
+        const originalName = ((imageFile as any).name as string | undefined) || 'upload.jpg';
+        const safeName = originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
+        const filename = `${Date.now()}-${safeName}`;
         const filepath = path.join(uploadDir, filename);
-        
+
         fs.writeFileSync(filepath, buffer);
         imageUrl = `/uploads/${filename}`;
-        writeToLog(`IMAGE SAVED: ${imageUrl}`);
+        writeToLog(`IMAGE SAVED LOCALLY: ${imageUrl}`);
       } catch (e: any) {
         writeToLog(`IMAGE ERROR: ${e.message}`);
-        imageUrl = "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80";
+        // Keep default imageUrl (Unsplash placeholder)
       }
     } else {
-       writeToLog("NO IMAGE OR BLOB INVALID");
+      writeToLog("NO IMAGE PROVIDED — using placeholder");
     }
 
     // 3. Prepare Object
