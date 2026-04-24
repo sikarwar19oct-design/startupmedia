@@ -4,7 +4,7 @@ import { saveArticle } from "@/app/actions";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import styles from "./editor.module.css";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import DeleteButton from "../dashboard/DeleteButton";
 
 export default function AdminEditor() {

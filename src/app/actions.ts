@@ -64,7 +64,8 @@ export async function saveArticle(formData: FormData) {
     let imageUrl = "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80";
 
     // 2. Image Upload — saves to public/uploads/ (local/self-hosted)
-    const isValidFile = imageFile && (imageFile instanceof Blob || imageFile instanceof File) && (imageFile as Blob).size > 0;
+    // File extends Blob, so instanceof Blob covers both File and Blob types
+    const isValidFile = imageFile instanceof Blob && imageFile.size > 0;
     if (isValidFile) {
       try {
         const blob = imageFile as Blob;
