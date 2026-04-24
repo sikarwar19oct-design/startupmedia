@@ -33,15 +33,10 @@ export default async function HomePage({
 
   const latestArticles = allArticles;
   
-  // INFINITE PAGINATION LOGIC:
-  // If no articles exist, just empty. Otherwise pretend we have 999 pages.
-  const totalPages = latestArticles.length === 0 ? 1 : 999;
-  const paginatedStories = latestArticles.length === 0 
-    ? [] 
-    : Array.from({ length: itemsPerPage }, (_, i) => {
-        const virtualIndex = (currentPage - 1) * itemsPerPage + i;
-        return latestArticles[virtualIndex % latestArticles.length];
-      });
+  // Normal Pagination:
+  const totalPages = Math.max(1, Math.ceil(latestArticles.length / itemsPerPage));
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedStories = latestArticles.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <>
