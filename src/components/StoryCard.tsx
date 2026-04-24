@@ -23,9 +23,14 @@ export default function StoryCard({
 }: StoryCardProps) {
   return (
     <MouseTilt intensity={10} className={styles.tiltWrapper}>
-      <Link href={`/article/${slug}`} className={styles.card}>
+      <Link
+        href={`/article/${encodeURIComponent(slug)}`}
+        className={styles.card}
+        prefetch={false}
+      >
         <div className={styles.imageWrap}>
-          <img src={image} alt={title} className={styles.image} />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={image} alt={title} className={styles.image} loading="lazy" />
           {trending && <span className={styles.trendingBadge}>🔥 Trending</span>}
         </div>
         <div className={styles.body}>

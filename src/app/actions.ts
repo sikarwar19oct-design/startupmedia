@@ -55,13 +55,15 @@ export async function saveArticle(formData: FormData) {
     const excerpt = formData.get("excerpt") as string;
     const content = formData.get("content") as string;
     const imageFile = formData.get("coverImage");
-    writeToLog(`FIELDS: title=${title}, slug=${slug}`);
+    const existingImageUrl = formData.get("existingImageUrl") as string | null;
+    writeToLog(`FIELDS: title=${title}, slug=${slug}, hasNewImage=${imageFile instanceof Blob && imageFile.size > 0}, hasExistingUrl=${!!existingImageUrl}`);
 
     if (!title || !slug) {
         return { success: false, error: "Title and Slug are required." };
     }
 
-    let imageUrl = "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80";
+    // Use existing image URL as default (preserves image when editing without re-uploading)
+    let imageUrl = existingImageUrl || "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=800&q=80";
 
     // 2. Image Upload — saves to public/uploads/ (local/self-hosted)
     // File extends Blob, so instanceof Blob covers both File and Blob types
